@@ -2,6 +2,7 @@ package com.github.mautini.pickaxe;
 
 import com.github.mautini.pickaxe.extractor.Extractor;
 import com.github.mautini.pickaxe.extractor.JsonLdExtractor;
+import com.github.mautini.pickaxe.extractor.MicrodataExtractor;
 import com.google.schemaorg.core.Thing;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,10 @@ public class Scraper {
     private List<Extractor> extractors;
 
     public Scraper() {
-        extractors = Collections.singletonList(new JsonLdExtractor());
+        extractors = Arrays.asList(
+                new JsonLdExtractor(),
+                new MicrodataExtractor()
+        );
     }
 
     public List<Thing> extract(File file) throws IOException {

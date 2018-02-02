@@ -18,4 +18,13 @@ public class ScraperTest {
         );
         Assertions.assertEquals(1, thingList.size());
     }
+
+    @Test
+    public void scraperMicrodataTest() throws IOException {
+        Scraper scraper = new Scraper();
+        List<Thing> thingList = scraper.extract(
+                new File(getClass().getClassLoader().getResource("microdata.html").getFile())
+        );
+        Assertions.assertEquals(1, thingList.size());
+    }
 }
