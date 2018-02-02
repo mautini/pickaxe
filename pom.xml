@@ -20,6 +20,7 @@
         <slf4j.version>1.7.25</slf4j.version>
         <jsoup.version>1.11.2</jsoup.version>
         <schemaorg-java.version>1.0.1</schemaorg-java.version>
+        <junit.version>5.0.3</junit.version>
     </properties>
 
     <dependencies>
@@ -57,6 +58,13 @@
             <groupId>com.github.mautini</groupId>
             <artifactId>schemaorg-java</artifactId>
             <version>${schemaorg-java.version}</version>
+        </dependency>
+
+        <!-- Junit -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
         </dependency>
     </dependencies>
 

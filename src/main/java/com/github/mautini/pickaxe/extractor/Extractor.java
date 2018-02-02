@@ -1,6 +1,6 @@
 package com.github.mautini.pickaxe.extractor;
 
-import com.google.schemaorg.core.Event;
+import com.google.schemaorg.core.Thing;
 import org.jsoup.nodes.Document;
 
 import java.util.List;
@@ -8,5 +8,5 @@ import java.util.List;
 @FunctionalInterface
 public interface Extractor {
 
-    List<Event> getEvents(Document document);
+    List<Thing> getThings(Document document);
 }
