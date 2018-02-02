@@ -1,3 +1,5 @@
+package com.github.mautini.pickaxe;
+
 import com.google.schemaorg.core.Thing;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
