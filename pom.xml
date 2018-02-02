@@ -18,6 +18,8 @@
         <!-- Dependencies Versions -->
         <log4j.version>2.10.0</log4j.version>
         <slf4j.version>1.7.25</slf4j.version>
+        <jsoup.version>1.11.2</jsoup.version>
+        <schemaorg-java.version>1.0.1</schemaorg-java.version>
     </properties>
 
     <dependencies>
@@ -41,6 +43,20 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
             <version>${log4j.version}</version>
+        </dependency>
+
+        <!-- Jsoup -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
+        </dependency>
+
+        <!-- Schema.org -->
+        <dependency>
+            <groupId>com.github.mautini</groupId>
+            <artifactId>schemaorg-java</artifactId>
+            <version>${schemaorg-java.version}</version>
         </dependency>
     </dependencies>
 
