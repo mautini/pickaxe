@@ -94,13 +94,12 @@ public class MicrodataExtractor implements Extractor {
                 method.invoke(thingBuilder, schema.getProperties().get(propertyName).get(0));
             }
 
-            thingBuilder.build();
+            return thingBuilder.build();
 
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
+            return null;
         }
-
-        return CoreFactory.newThingBuilder().build();
     }
 
     /**
