@@ -7,6 +7,8 @@ public class Schema {
 
     private String type;
 
+    private String propertyName;
+
     private Map<String, List<String>> properties;
 
     private List<Schema> children;
@@ -20,6 +22,14 @@ public class Schema {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getPropertyName() {
+        return propertyName;
+    }
+
+    public void setPropertyName(String propertyName) {
+        this.propertyName = propertyName;
     }
 
     public Map<String, List<String>> getProperties() {

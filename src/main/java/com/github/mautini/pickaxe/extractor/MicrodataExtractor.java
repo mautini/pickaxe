@@ -47,8 +47,6 @@ public class MicrodataExtractor implements Extractor {
      * @return a tree with the attributes and the objects of the element
      */
     private Schema getTree(Element parent) {
-        String type = parent.attr(ITEM_TYPE);
-
         // Find all the attributes (itemprop)
         Elements elements = parent.select(String.format("> [%s]:not([%s])", ITEM_PROP, ITEM_SCOPE));
         Map<String, List<String>> properties = elements.stream()
@@ -62,7 +60,8 @@ public class MicrodataExtractor implements Extractor {
                 );
 
         Schema schema = new Schema();
-        schema.setType(type);
+        schema.setType(parent.attr(ITEM_TYPE));
+        schema.setPropertyName(parent.attr(ITEM_PROP));
         schema.setProperties(properties);
 
         // Find all the objects in this object and map them to Schema

@@ -27,6 +27,7 @@ public class SchemaToThingConverter {
              */
             Thing.Builder thingBuilder = getBuilder(typeName);
             setProperties(thingBuilder, schema, builderClass);
+            setChildren(thingBuilder, schema, builderClass);
 
             return thingBuilder.build();
 
@@ -46,6 +47,18 @@ public class SchemaToThingConverter {
             String methodName = String.format("add%s", capitalize(propertyName));
             Method method = builderClass.getMethod(methodName, String.class);
             method.invoke(builder, schema.getProperties().get(propertyName).get(0));
+        }
+    }
+
+    private static void setChildren(Thing.Builder builder, Schema schema, Class<?> builderClass)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassNotFoundException {
+
+        for (Schema child : schema.getChildren()) {
+            Thing thing = convert(child);
+
+            String methodName = String.format("add%s", capitalize(child.getPropertyName()));
+            Method method = builderClass.getMethod(methodName, getInterfaceClass(getTypeName(child)));
+            method.invoke(builder, thing);
         }
     }
 
@@ -74,6 +87,12 @@ public class SchemaToThingConverter {
      */
     private static Class<?> getBuilderClass(String typeName) throws ClassNotFoundException {
         String className = String.format("%s.%s$Builder", PACKAGE_SCHEMAORG, typeName);
+
+        return Class.forName(className);
+    }
+
+    private static Class<?> getInterfaceClass(String typeName) throws ClassNotFoundException {
+        String className = String.format("%s.%s", PACKAGE_SCHEMAORG, typeName);
 
         return Class.forName(className);
     }

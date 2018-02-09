@@ -65,6 +65,6 @@ public class ScraperTest {
 
     private void assertUniqueValue(ImmutableList<SchemaOrgType> values, String expected) {
         Assertions.assertEquals(1, values.size());
-        Assertions.assertEquals(((DataType) values.get(0)).getValue(), expected);
+        Assertions.assertEquals(expected, ((DataType) values.get(0)).getValue());
     }
 }
