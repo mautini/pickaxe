@@ -50,13 +50,13 @@ public class MicrodataExtractor implements Extractor {
         String type = parent.attr(ITEM_TYPE);
 
         // Find all the attributes (itemprop)
-        Elements elements = parent.select(String.format("> [%s]", ITEM_PROP));
+        Elements elements = parent.select(String.format("> [%s]:not([%s])", ITEM_PROP, ITEM_SCOPE));
         Map<String, List<String>> properties = elements.stream()
                 .collect(
                         Collectors.groupingBy(
                                 element -> element.attr(ITEM_PROP),
                                 Collectors.mapping(
-                                        Element::html, Collectors.toList()
+                                        this::getValue, Collectors.toList()
                                 )
                         )
                 );
@@ -74,5 +74,9 @@ public class MicrodataExtractor implements Extractor {
         );
 
         return schema;
+    }
+
+    private String getValue(Element element) {
+        return element.hasAttr("content") ? element.attr("content") : element.html();
     }
 }
