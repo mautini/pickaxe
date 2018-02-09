@@ -30,7 +30,15 @@ public class Scraper {
 
     public List<Thing> extract(File file) throws IOException {
         Document document = Jsoup.parse(file, "UTF-8");
+        return scrap(document);
+    }
 
+    public List<Thing> extract(String url) throws IOException {
+        Document document = Jsoup.connect(url).get();
+        return scrap(document);
+    }
+
+    private List<Thing> scrap(Document document) {
         return extractors.stream()
                 .flatMap(extractor -> extractor.getThings(document).stream())
                 .collect(Collectors.toList());
