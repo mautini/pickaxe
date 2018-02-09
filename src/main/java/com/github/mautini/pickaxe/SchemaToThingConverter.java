@@ -26,29 +26,37 @@ public class SchemaToThingConverter {
              * the methods are public and can be called using reflection.
              */
             Thing.Builder thingBuilder = getBuilder(typeName);
-
-            // Set all the properties
-            for (String propertyName : schema.getProperties().keySet()) {
-                String methodName = String.format("add%s", capitalize(propertyName));
-                Method method = builderClass.getMethod(methodName, String.class);
-                method.invoke(thingBuilder, schema.getProperties().get(propertyName).get(0));
-            }
+            setProperties(thingBuilder, schema, builderClass);
 
             return thingBuilder.build();
 
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException
+                | ClassNotFoundException e) {
+
             e.printStackTrace();
             return null;
         }
     }
 
+    private static void setProperties(Thing.Builder builder, Schema schema, Class<?> builderClass)
+            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+        // Set all the properties
+        for (String propertyName : schema.getProperties().keySet()) {
+            String methodName = String.format("add%s", capitalize(propertyName));
+            Method method = builderClass.getMethod(methodName, String.class);
+            method.invoke(builder, schema.getProperties().get(propertyName).get(0));
+        }
+    }
+
     /**
      * Return a schema.org build for the specified type
+     *
      * @param typeName the type of the builder we want
      * @return the builder
-     * @throws NoSuchMethodException if we can't find the function used to get the builder
+     * @throws NoSuchMethodException     if we can't find the function used to get the builder
      * @throws InvocationTargetException if we can't invoke the function used to get the builder
-     * @throws IllegalAccessException if the function used to get the builder is inaccessible
+     * @throws IllegalAccessException    if the function used to get the builder is inaccessible
      */
     private static Thing.Builder getBuilder(String typeName) throws NoSuchMethodException, InvocationTargetException,
             IllegalAccessException {
