@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 
 public class SchemaToThingConverter {
 
-    private static final String PACKAGE_SCHEMAORG = "com.google.schemaorg.core";
+    private static final String PACKAGE_SCHEMA_ORG = "com.google.schemaorg.core";
 
     public static Thing convert(Schema schema) {
 
@@ -86,13 +86,13 @@ public class SchemaToThingConverter {
      * @throws ClassNotFoundException if the class for the specified type name does not exist
      */
     private static Class<?> getBuilderClass(String typeName) throws ClassNotFoundException {
-        String className = String.format("%s.%s$Builder", PACKAGE_SCHEMAORG, typeName);
+        String className = String.format("%s.%s$Builder", PACKAGE_SCHEMA_ORG, typeName);
 
         return Class.forName(className);
     }
 
     private static Class<?> getInterfaceClass(String typeName) throws ClassNotFoundException {
-        String className = String.format("%s.%s", PACKAGE_SCHEMAORG, typeName);
+        String className = String.format("%s.%s", PACKAGE_SCHEMA_ORG, typeName);
 
         return Class.forName(className);
     }

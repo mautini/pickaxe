@@ -17,13 +17,13 @@ public class MicrodataExtractor implements Extractor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrodataExtractor.class);
 
-    private static final String NAMESPACE = "http://schema.org/";
-
     private static final String ITEM_TYPE = "itemtype";
 
     private static final String ITEM_SCOPE = "itemscope";
 
     private static final String ITEM_PROP = "itemprop";
+
+    private static final String HYPERLINK_TAG = "a";
 
     @Override
     public List<Thing> getThings(Document document) {
@@ -76,6 +76,14 @@ public class MicrodataExtractor implements Extractor {
     }
 
     private String getValue(Element element) {
-        return element.hasAttr("content") ? element.attr("content") : element.html();
+        if (HYPERLINK_TAG.equals(element.tagName()) && element.hasAttr("href")) {
+            return element.attr("href");
+        }
+
+        if (element.hasAttr("content")) {
+            return element.attr("content");
+        }
+
+        return element.html();
     }
 }
