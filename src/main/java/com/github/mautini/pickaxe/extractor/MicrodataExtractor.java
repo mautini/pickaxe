@@ -1,8 +1,7 @@
 package com.github.mautini.pickaxe.extractor;
 
+import com.github.mautini.pickaxe.SchemaToThingConverter;
 import com.github.mautini.pickaxe.model.Schema;
-import com.google.schemaorg.core.CoreConstants;
-import com.google.schemaorg.core.CoreFactory;
 import com.google.schemaorg.core.Thing;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,8 +9,6 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,11 +30,11 @@ public class MicrodataExtractor implements Extractor {
         Elements elements = getElements(document);
         return elements.stream()
                 .map(this::getTree)
-                .map(this::toThing)
+                .map(SchemaToThingConverter::convert)
                 .collect(Collectors.toList());
     }
 
-    public Elements getElements(Document document) {
+    private Elements getElements(Document document) {
         // All the itemscope that don't have an itemscope in parent (to get the top level item scope)
         String query = String.format("[%s]:not([%<s] > [%<s])", ITEM_SCOPE);
         return document.select(query);
@@ -77,38 +74,5 @@ public class MicrodataExtractor implements Extractor {
         );
 
         return schema;
-    }
-
-    private Thing toThing(Schema schema) {
-        String typeName = schema.getType().substring(CoreConstants.NAMESPACE.length());
-        String builderName = String.format("new%sBuilder", typeName);
-
-        try {
-            Thing.Builder thingBuilder = (Thing.Builder) CoreFactory.class.getMethod(builderName).invoke(null);
-
-            // Set all the properties
-            for (String propertyName : schema.getProperties().keySet()) {
-                String methodName = String.format("add%s", capitalize(propertyName));
-                Method method = thingBuilder.getClass().getMethod(methodName, String.class);
-                method.setAccessible(true);
-                method.invoke(thingBuilder, schema.getProperties().get(propertyName).get(0));
-            }
-
-            return thingBuilder.build();
-
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
-     * Capitalize the first letter of the string in parameter
-     *
-     * @param name the string to capitalize
-     * @return the capitalized string
-     */
-    private static String capitalize(String name) {
-        return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 }
