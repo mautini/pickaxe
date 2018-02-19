@@ -1,5 +1,6 @@
 package com.github.mautini.pickaxe;
 
+import com.github.mautini.pickaxe.model.Entity;
 import com.google.common.collect.ImmutableList;
 import com.google.schemaorg.SchemaOrgType;
 import com.google.schemaorg.core.Event;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 public class ScraperTest {
@@ -20,25 +22,74 @@ public class ScraperTest {
     @Test
     public void scraperJsonLdTest() throws IOException {
         Scraper scraper = new Scraper();
-        List<Thing> thingList = scraper.extract(
+        List<Entity> entityList = scraper.extract(
                 new File(getClass().getClassLoader().getResource("jsonld.html").getFile())
         );
-        assertEvent(thingList);
+
+        Assertions.assertEquals(1, entityList.size());
+        Entity entity = entityList.get(0);
+        Assertions.assertEquals("<script type=\"application/ld+json\">\n" +
+                "{\n" +
+                "  \"@context\": \"http://schema.org\",\n" +
+                "  \"@type\": \"Event\",\n" +
+                "  \"location\": {\n" +
+                "    \"@type\": \"Place\",\n" +
+                "    \"address\": {\n" +
+                "      \"@type\": \"PostalAddress\",\n" +
+                "      \"addressLocality\": \"Denver\",\n" +
+                "      \"addressRegion\": \"CO\",\n" +
+                "      \"postalCode\": \"80209\",\n" +
+                "      \"streetAddress\": \"7 S. Broadway\"\n" +
+                "    },\n" +
+                "    \"name\": \"The Hi-Dive\"\n" +
+                "  },\n" +
+                "  \"name\": \"Typhoon with Radiation City\",\n" +
+                "  \"offers\": {\n" +
+                "    \"@type\": \"Offer\",\n" +
+                "    \"price\": \"13.00\",\n" +
+                "    \"priceCurrency\": \"USD\",\n" +
+                "    \"url\": \"http://www.ticketfly.com/purchase/309433\"\n" +
+                "  },\n" +
+                "  \"startDate\": \"2013-09-14T21:30\"\n" +
+                "}\n" +
+                "</script>", entity.getRawEntity());
+        assertEvent(entity.getThing());
     }
 
     @Test
     public void scraperMicrodataTest() throws IOException {
         Scraper scraper = new Scraper();
-        List<Thing> thingList = scraper.extract(
+        List<Entity> entityList = scraper.extract(
                 new File(getClass().getClassLoader().getResource("microdata.html").getFile())
         );
-        assertEvent(thingList);
+        Assertions.assertEquals(1, entityList.size());
+        Entity entity = entityList.get(0);
+        Assertions.assertEquals("<div class=\"event-wrapper\" itemscope itemtype=\"http://schema.org/Event\">\n" +
+                "    <div class=\"event-date\" itemprop=\"startDate\" content=\"2013-09-14T21:30\">Sat Sep 14</div>\n" +
+                "    <div class=\"event-title\" itemprop=\"name\">Typhoon with Radiation City</div>\n" +
+                "    <div class=\"event-venue\" itemprop=\"location\" itemscope itemtype=\"http://schema.org/Place\">\n" +
+                "        <span itemprop=\"name\">The Hi-Dive</span>\n" +
+                "        <div class=\"address\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">\n" +
+                "            <span itemprop=\"streetAddress\">7 S. Broadway</span>\n" +
+                "            <br>\n" +
+                "            <span itemprop=\"addressLocality\">Denver</span>,\n" +
+                "            <span itemprop=\"addressRegion\">CO</span>\n" +
+                "            <span itemprop=\"postalCode\">80209</span>\n" +
+                "        </div>\n" +
+                "    </div>\n" +
+                "    <div class=\"event-time\">9:30 PM</div>\n" +
+                "    <span itemprop=\"offers\" itemscope itemtype=\"http://schema.org/Offer\">\n" +
+                "        <div class=\"event-price\" itemprop=\"price\" content=\"13.00\">$13.00</div>\n" +
+                "        <span itemprop=\"priceCurrency\" content=\"USD\" />\n" +
+                "        <a itemprop=\"url\" href=\"http://www.ticketfly.com/purchase/309433\">Tickets</a>\n" +
+                "    </span>\n" +
+                "</div>", entity.getRawEntity());
+        assertEvent(entity.getThing());
     }
 
-    private void assertEvent(List<Thing> thingList) {
-        Assertions.assertEquals(1, thingList.size());
-        Assertions.assertTrue(thingList.get(0) instanceof Event);
-        Event event = (Event) thingList.get(0);
+    private void assertEvent(Thing thing) {
+        Assertions.assertTrue(thing instanceof Event);
+        Event event = (Event) thing;
         assertUniqueValue(event.getStartDateList(), "2013-09-14T21:30");
         assertUniqueValue(event.getNameList(), "Typhoon with Radiation City");
 

@@ -3,7 +3,7 @@ package com.github.mautini.pickaxe;
 import com.github.mautini.pickaxe.extractor.Extractor;
 import com.github.mautini.pickaxe.extractor.JsonLdExtractor;
 import com.github.mautini.pickaxe.extractor.MicrodataExtractor;
-import com.google.schemaorg.core.Thing;
+import com.github.mautini.pickaxe.model.Entity;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,17 +29,17 @@ public class Scraper {
         );
     }
 
-    public List<Thing> extract(File file) throws IOException {
+    public List<Entity> extract(File file) throws IOException {
         Document document = Jsoup.parse(file, "UTF-8");
         return scrap(document);
     }
 
-    public List<Thing> extract(String url) throws IOException {
-        Document document = Jsoup.connect(url).get();
+    public List<Entity> extract(URL url, int timeout) throws IOException {
+        Document document = Jsoup.parse(url, timeout);
         return scrap(document);
     }
 
-    private List<Thing> scrap(Document document) {
+    private List<Entity> scrap(Document document) {
         return extractors.stream()
                 .flatMap(extractor -> extractor.getThings(document).stream())
                 .collect(Collectors.toList());

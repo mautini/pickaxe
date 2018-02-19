@@ -1,6 +1,7 @@
 package com.github.mautini.pickaxe.extractor;
 
 import com.github.mautini.pickaxe.SchemaToThingConverter;
+import com.github.mautini.pickaxe.model.Entity;
 import com.github.mautini.pickaxe.model.Schema;
 import com.google.schemaorg.core.Thing;
 import org.jsoup.nodes.Document;
@@ -26,11 +27,16 @@ public class MicrodataExtractor implements Extractor {
     private static final String HYPERLINK_TAG = "a";
 
     @Override
-    public List<Thing> getThings(Document document) {
+    public List<Entity> getThings(Document document) {
         Elements elements = getElements(document);
+
         return elements.stream()
-                .map(this::getTree)
-                .map(SchemaToThingConverter::convert)
+                .map(element -> {
+                    Schema schema = getTree(element);
+                    Thing thing = SchemaToThingConverter.convert(schema);
+
+                    return new Entity(element.toString(), thing);
+                })
                 .collect(Collectors.toList());
     }
 
