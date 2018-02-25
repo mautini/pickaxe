@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MicrodataExtractor implements Extractor {
 
@@ -31,11 +33,12 @@ public class MicrodataExtractor implements Extractor {
         Elements elements = getElements(document);
 
         return elements.stream()
-                .map(element -> {
+                .flatMap(element -> {
                     Schema schema = getTree(element);
-                    Thing thing = SchemaToThingConverter.convert(schema);
-
-                    return new Entity(element.toString(), thing);
+                    Optional<Thing> optionalThing = SchemaToThingConverter.convert(schema);
+                    return optionalThing
+                            .map(thing -> Stream.of(new Entity(element.toString(), thing)))
+                            .orElseGet(Stream::empty);
                 })
                 .collect(Collectors.toList());
     }

@@ -63,27 +63,41 @@ public class ScraperTest {
         );
         Assertions.assertEquals(1, entityList.size());
         Entity entity = entityList.get(0);
-        Assertions.assertEquals("<div class=\"event-wrapper\" itemscope itemtype=\"http://schema.org/Event\">\n" +
-                "    <div class=\"event-date\" itemprop=\"startDate\" content=\"2013-09-14T21:30\">Sat Sep 14</div>\n" +
-                "    <div class=\"event-title\" itemprop=\"name\">Typhoon with Radiation City</div>\n" +
-                "    <div class=\"event-venue\" itemprop=\"location\" itemscope itemtype=\"http://schema.org/Place\">\n" +
-                "        <span itemprop=\"name\">The Hi-Dive</span>\n" +
-                "        <div class=\"address\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\">\n" +
-                "            <span itemprop=\"streetAddress\">7 S. Broadway</span>\n" +
-                "            <br>\n" +
-                "            <span itemprop=\"addressLocality\">Denver</span>,\n" +
-                "            <span itemprop=\"addressRegion\">CO</span>\n" +
-                "            <span itemprop=\"postalCode\">80209</span>\n" +
-                "        </div>\n" +
-                "    </div>\n" +
-                "    <div class=\"event-time\">9:30 PM</div>\n" +
-                "    <span itemprop=\"offers\" itemscope itemtype=\"http://schema.org/Offer\">\n" +
-                "        <div class=\"event-price\" itemprop=\"price\" content=\"13.00\">$13.00</div>\n" +
-                "        <span itemprop=\"priceCurrency\" content=\"USD\" />\n" +
-                "        <a itemprop=\"url\" href=\"http://www.ticketfly.com/purchase/309433\">Tickets</a>\n" +
-                "    </span>\n" +
+        Assertions.assertEquals("<div class=\"event-wrapper\" itemscope itemtype=\"http://schema.org/Event\"> \n" +
+                " <div class=\"event-date\" itemprop=\"startDate\" content=\"2013-09-14T21:30\">\n" +
+                "  Sat Sep 14\n" +
+                " </div> \n" +
+                " <div class=\"event-title\" itemprop=\"name\">\n" +
+                "  Typhoon with Radiation City\n" +
+                " </div> \n" +
+                " <div class=\"event-venue\" itemprop=\"location\" itemscope itemtype=\"http://schema.org/Place\"> \n" +
+                "  <span itemprop=\"name\">The Hi-Dive</span> \n" +
+                "  <div class=\"address\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\"> \n" +
+                "   <span itemprop=\"streetAddress\">7 S. Broadway</span> \n" +
+                "   <br> \n" +
+                "   <span itemprop=\"addressLocality\">Denver</span>, \n" +
+                "   <span itemprop=\"addressRegion\">CO</span> \n" +
+                "   <span itemprop=\"postalCode\">80209</span> \n" +
+                "  </div> \n" +
+                " </div> \n" +
+                " <div class=\"event-time\">\n" +
+                "  9:30 PM\n" +
+                " </div> \n" +
+                " <span itemprop=\"offers\" itemscope itemtype=\"http://schema.org/Offer\"> \n" +
+                "  <div class=\"event-price\" itemprop=\"price\" content=\"13.00\">\n" +
+                "   $13.00\n" +
+                "  </div> <span itemprop=\"priceCurrency\" content=\"USD\"></span> <a itemprop=\"url\" href=\"http://www.ticketfly.com/purchase/309433\">Tickets</a> </span> \n" +
                 "</div>", entity.getRawEntity());
         assertEvent(entity.getThing());
+    }
+
+    @Test
+    public void scraperFakeNamespaceTest() throws IOException {
+        Scraper scraper = new Scraper();
+        List<Entity> entityList = scraper.extract(
+                new File(getClass().getClassLoader().getResource("fakeNamespace.html").getFile())
+        );
+        Assertions.assertEquals(0, entityList.size());
     }
 
     private void assertEvent(Thing thing) {

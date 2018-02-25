@@ -7,12 +7,17 @@ import com.google.schemaorg.core.Thing;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Optional;
 
 public class SchemaToThingConverter {
 
     private static final String PACKAGE_SCHEMA_ORG = "com.google.schemaorg.core";
 
-    public static Thing convert(Schema schema) {
+    public static Optional<Thing> convert(Schema schema) {
+
+        if (!schema.getType().startsWith(CoreConstants.NAMESPACE)) {
+            return Optional.empty();
+        }
 
         try {
             // Find the type of the schema we're currently converting
@@ -29,13 +34,13 @@ public class SchemaToThingConverter {
             setProperties(thingBuilder, schema, builderClass);
             setChildren(thingBuilder, schema, builderClass);
 
-            return thingBuilder.build();
+            return Optional.of(thingBuilder.build());
 
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException
                 | ClassNotFoundException e) {
 
             e.printStackTrace();
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -54,11 +59,12 @@ public class SchemaToThingConverter {
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassNotFoundException {
 
         for (Schema child : schema.getChildren()) {
-            Thing thing = convert(child);
-
-            String methodName = String.format("add%s", capitalize(child.getPropertyName()));
-            Method method = builderClass.getMethod(methodName, getInterfaceClass(getTypeName(child)));
-            method.invoke(builder, thing);
+            Optional<Thing> optionalThing = convert(child);
+            if (optionalThing.isPresent()) {
+                String methodName = String.format("add%s", capitalize(child.getPropertyName()));
+                Method method = builderClass.getMethod(methodName, getInterfaceClass(getTypeName(child)));
+                method.invoke(builder, optionalThing.get());
+            }
         }
     }
 
