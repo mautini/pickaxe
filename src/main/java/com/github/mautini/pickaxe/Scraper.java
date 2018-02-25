@@ -39,6 +39,11 @@ public class Scraper {
         return scrap(document);
     }
 
+    public List<Entity> extract(String html) {
+        Document document = Jsoup.parse(html);
+        return scrap(document);
+    }
+
     private List<Entity> scrap(Document document) {
         return extractors.stream()
                 .flatMap(extractor -> extractor.getThings(document).stream())
