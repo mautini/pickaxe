@@ -45,7 +45,7 @@ public class MicrodataExtractor implements Extractor {
 
     private Elements getElements(Document document) {
         // All the itemscope that don't have an itemscope in parent (to get the top level item scope)
-        String query = String.format("[%s]:not([%<s] > [%<s])", ITEM_SCOPE);
+        String query = String.format("[%s]:not([%<s] [%<s])", ITEM_SCOPE);
         return document.select(query);
     }
 
@@ -56,9 +56,13 @@ public class MicrodataExtractor implements Extractor {
      * @return a tree with the attributes and the objects of the element
      */
     private Schema getTree(Element parent) {
-        // Find all the attributes (itemprop)
-        Elements elements = parent.select(String.format("> [%s]:not([%s])", ITEM_PROP, ITEM_SCOPE));
-        Map<String, List<String>> properties = elements.stream()
+        // Find all the children itemscope and remove them from the parent
+        Elements children = parent.children().select(String.format("[%s]:not([%<s] [%<s])", ITEM_SCOPE)).remove();
+
+        // Get all the attributes for the parent
+        Elements attributes = parent.select(String.format("[%s]:not([%s])", ITEM_PROP, ITEM_SCOPE));
+
+        Map<String, List<String>> properties = attributes.stream()
                 .collect(
                         Collectors.groupingBy(
                                 element -> element.attr(ITEM_PROP),
@@ -74,13 +78,11 @@ public class MicrodataExtractor implements Extractor {
         schema.setProperties(properties);
 
         // Find all the objects in this object and map them to Schema
-        Elements children = parent.select(String.format("> [%s]", ITEM_SCOPE));
         schema.setChildren(
                 children.stream()
                         .map(this::getTree)
                         .collect(Collectors.toList())
         );
-
         return schema;
     }
 
