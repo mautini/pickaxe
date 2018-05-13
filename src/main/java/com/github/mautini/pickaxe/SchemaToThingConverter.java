@@ -4,6 +4,7 @@ import com.github.mautini.pickaxe.model.Schema;
 import com.google.schemaorg.core.CoreConstants;
 import com.google.schemaorg.core.CoreFactory;
 import com.google.schemaorg.core.Thing;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -59,11 +60,13 @@ public class SchemaToThingConverter {
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassNotFoundException {
 
         for (Schema child : schema.getChildren()) {
-            Optional<Thing> optionalThing = convert(child);
-            if (optionalThing.isPresent()) {
-                String methodName = String.format("add%s", capitalize(child.getPropertyName()));
-                Method method = builderClass.getMethod(methodName, getInterfaceClass(getTypeName(child)));
-                method.invoke(builder, optionalThing.get());
+            if (!StringUtils.isEmpty(child.getPropertyName())) {
+                Optional<Thing> optionalThing = convert(child);
+                if (optionalThing.isPresent()) {
+                    String methodName = String.format("add%s", capitalize(child.getPropertyName()));
+                    Method method = builderClass.getMethod(methodName, getInterfaceClass(getTypeName(child)));
+                    method.invoke(builder, optionalThing.get());
+                }
             }
         }
     }

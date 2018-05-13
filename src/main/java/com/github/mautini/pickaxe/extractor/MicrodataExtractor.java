@@ -4,6 +4,7 @@ import com.github.mautini.pickaxe.SchemaToThingConverter;
 import com.github.mautini.pickaxe.model.Entity;
 import com.github.mautini.pickaxe.model.Schema;
 import com.google.schemaorg.core.Thing;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -63,6 +64,7 @@ public class MicrodataExtractor implements Extractor {
         Elements attributes = parent.select(String.format("[%s]:not([%s])", ITEM_PROP, ITEM_SCOPE));
 
         Map<String, List<String>> properties = attributes.stream()
+                .filter(element -> !StringUtils.isEmpty(element.attr(ITEM_PROP)))
                 .collect(
                         Collectors.groupingBy(
                                 element -> element.attr(ITEM_PROP),

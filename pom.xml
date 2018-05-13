@@ -6,7 +6,7 @@
 
     <groupId>com.github.mautini</groupId>
     <artifactId>pickaxe</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -20,6 +20,7 @@
         <slf4j.version>1.7.25</slf4j.version>
         <jsoup.version>1.11.3</jsoup.version>
         <schemaorg-java.version>1.0.1</schemaorg-java.version>
+        <commons-lang3.version>3.7</commons-lang3.version>
         <junit.version>5.2.0</junit.version>
     </properties>
 
@@ -65,6 +66,13 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
+        </dependency>
+
+        <!-- Utils -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.7</version>
         </dependency>
     </dependencies>
 
