@@ -46,26 +46,36 @@ public class SchemaToThingConverter {
     }
 
     private static void setProperties(Thing.Builder builder, Schema schema, Class<?> builderClass)
-            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+            throws InvocationTargetException, IllegalAccessException {
 
         // Set all the properties
         for (String propertyName : schema.getProperties().keySet()) {
-            String methodName = String.format("add%s", capitalize(propertyName));
-            Method method = builderClass.getMethod(methodName, String.class);
-            method.invoke(builder, schema.getProperties().get(propertyName).get(0));
+            try {
+                String methodName = String.format("add%s", capitalize(propertyName));
+                Method method = builderClass.getMethod(methodName, String.class);
+                method.invoke(builder, schema.getProperties().get(propertyName).get(0));
+            }
+            catch (NoSuchMethodException e){
+                builder.addProperty(propertyName, schema.getProperties().get(propertyName).get(0));
+            }
         }
     }
 
     private static void setChildren(Thing.Builder builder, Schema schema, Class<?> builderClass)
-            throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, ClassNotFoundException {
+            throws InvocationTargetException, IllegalAccessException, ClassNotFoundException {
 
         for (Schema child : schema.getChildren()) {
             if (!StringUtils.isEmpty(child.getPropertyName())) {
                 Optional<Thing> optionalThing = convert(child);
                 if (optionalThing.isPresent()) {
-                    String methodName = String.format("add%s", capitalize(child.getPropertyName()));
-                    Method method = builderClass.getMethod(methodName, getInterfaceClass(getTypeName(child)));
-                    method.invoke(builder, optionalThing.get());
+                    try {
+                        String methodName = String.format("add%s", capitalize(child.getPropertyName()));
+                        Method method = builderClass.getMethod(methodName, getInterfaceClass(getTypeName(child)));
+                        method.invoke(builder, optionalThing.get());
+                    }
+                    catch (NoSuchMethodException e){
+                        builder.addProperty(child.getPropertyName(), optionalThing.get());
+                    }
                 }
             }
         }
