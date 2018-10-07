@@ -1,8 +1,10 @@
 package com.github.mautini.pickaxe.extractor;
 
 import com.github.mautini.pickaxe.SchemaToThingConverter;
+import com.github.mautini.pickaxe.model.Entity;
 import com.github.mautini.pickaxe.model.Schema;
 import com.google.schemaorg.core.Thing;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -11,7 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MicrodataExtractor implements Extractor {
 
@@ -25,18 +29,26 @@ public class MicrodataExtractor implements Extractor {
 
     private static final String HYPERLINK_TAG = "a";
 
+    private static final String IMAGE_TAG = "img";
+
     @Override
-    public List<Thing> getThings(Document document) {
+    public List<Entity> getThings(Document document) {
         Elements elements = getElements(document);
+
         return elements.stream()
-                .map(this::getTree)
-                .map(SchemaToThingConverter::convert)
+                .flatMap(element -> {
+                    Schema schema = getTree(element);
+                    Optional<Thing> optionalThing = SchemaToThingConverter.convert(schema);
+                    return optionalThing
+                            .map(thing -> Stream.of(new Entity(element.toString(), thing)))
+                            .orElseGet(Stream::empty);
+                })
                 .collect(Collectors.toList());
     }
 
     private Elements getElements(Document document) {
         // All the itemscope that don't have an itemscope in parent (to get the top level item scope)
-        String query = String.format("[%s]:not([%<s] > [%<s])", ITEM_SCOPE);
+        String query = String.format("[%s]:not([%<s] [%<s])", ITEM_SCOPE);
         return document.select(query);
     }
 
@@ -47,9 +59,16 @@ public class MicrodataExtractor implements Extractor {
      * @return a tree with the attributes and the objects of the element
      */
     private Schema getTree(Element parent) {
-        // Find all the attributes (itemprop)
-        Elements elements = parent.select(String.format("> [%s]:not([%s])", ITEM_PROP, ITEM_SCOPE));
-        Map<String, List<String>> properties = elements.stream()
+        // Create a copy to not modify the parameter
+        Element workingElement = parent.clone();
+        // Find all the children itemscope and remove them from the parent
+        Elements children = workingElement.children().select(String.format("[%s]:not([%<s] [%<s])", ITEM_SCOPE)).remove();
+
+        // Get all the attributes for the parent
+        Elements attributes = workingElement.select(String.format("[%s]:not([%s])", ITEM_PROP, ITEM_SCOPE));
+
+        Map<String, List<String>> properties = attributes.stream()
+                .filter(element -> !StringUtils.isEmpty(element.attr(ITEM_PROP)))
                 .collect(
                         Collectors.groupingBy(
                                 element -> element.attr(ITEM_PROP),
@@ -60,24 +79,26 @@ public class MicrodataExtractor implements Extractor {
                 );
 
         Schema schema = new Schema();
-        schema.setType(parent.attr(ITEM_TYPE));
-        schema.setPropertyName(parent.attr(ITEM_PROP));
+        schema.setType(workingElement.attr(ITEM_TYPE));
+        schema.setPropertyName(workingElement.attr(ITEM_PROP));
         schema.setProperties(properties);
 
         // Find all the objects in this object and map them to Schema
-        Elements children = parent.select(String.format("> [%s]", ITEM_SCOPE));
         schema.setChildren(
                 children.stream()
                         .map(this::getTree)
                         .collect(Collectors.toList())
         );
-
         return schema;
     }
 
     private String getValue(Element element) {
         if (HYPERLINK_TAG.equals(element.tagName()) && element.hasAttr("href")) {
             return element.attr("href");
+        }
+
+        if (IMAGE_TAG.equals(element.tagName()) && element.hasAttr("src")) {
+            return element.attr("src");
         }
 
         if (element.hasAttr("content")) {

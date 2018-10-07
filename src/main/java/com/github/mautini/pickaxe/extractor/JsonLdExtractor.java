@@ -1,8 +1,8 @@
 package com.github.mautini.pickaxe.extractor;
 
+import com.github.mautini.pickaxe.model.Entity;
 import com.google.schemaorg.JsonLdSerializer;
 import com.google.schemaorg.JsonLdSyntaxException;
-import com.google.schemaorg.core.Thing;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -24,7 +24,7 @@ public class JsonLdExtractor implements Extractor {
     }
 
     @Override
-    public List<Thing> getThings(Document document) {
+    public List<Entity> getThings(Document document) {
         Elements elements = getElements(document);
 
         return elements.stream()
@@ -47,12 +47,14 @@ public class JsonLdExtractor implements Extractor {
      * using the jsonLdSerializer
      *
      * @param element the element to parse
-     * @return the list of things if any
+     * @return the list of entity if any
      */
-    private List<Thing> parseThings(Element element) {
+    private List<Entity> parseThings(Element element) {
 
         try {
-            return jsonLdSerializer.deserialize(element.html());
+            return jsonLdSerializer.deserialize(element.html()).stream()
+                    .map(thing -> new Entity(element.toString(), thing))
+                    .collect(Collectors.toList());
         } catch (JsonLdSyntaxException e) {
             // Fail to parse the json-ld, return an empty array list
             LOGGER.warn("Error during the json-ld parsing", e);
