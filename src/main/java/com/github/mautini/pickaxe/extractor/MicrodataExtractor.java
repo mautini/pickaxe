@@ -29,6 +29,8 @@ public class MicrodataExtractor implements Extractor {
 
     private static final String HYPERLINK_TAG = "a";
 
+    private static final String IMAGE_TAG = "img";
+
     @Override
     public List<Entity> getThings(Document document) {
         Elements elements = getElements(document);
@@ -57,11 +59,13 @@ public class MicrodataExtractor implements Extractor {
      * @return a tree with the attributes and the objects of the element
      */
     private Schema getTree(Element parent) {
+        // Create a copy to not modify the parameter
+        Element workingElement = parent.clone();
         // Find all the children itemscope and remove them from the parent
-        Elements children = parent.children().select(String.format("[%s]:not([%<s] [%<s])", ITEM_SCOPE)).remove();
+        Elements children = workingElement.children().select(String.format("[%s]:not([%<s] [%<s])", ITEM_SCOPE)).remove();
 
         // Get all the attributes for the parent
-        Elements attributes = parent.select(String.format("[%s]:not([%s])", ITEM_PROP, ITEM_SCOPE));
+        Elements attributes = workingElement.select(String.format("[%s]:not([%s])", ITEM_PROP, ITEM_SCOPE));
 
         Map<String, List<String>> properties = attributes.stream()
                 .filter(element -> !StringUtils.isEmpty(element.attr(ITEM_PROP)))
@@ -75,8 +79,8 @@ public class MicrodataExtractor implements Extractor {
                 );
 
         Schema schema = new Schema();
-        schema.setType(parent.attr(ITEM_TYPE));
-        schema.setPropertyName(parent.attr(ITEM_PROP));
+        schema.setType(workingElement.attr(ITEM_TYPE));
+        schema.setPropertyName(workingElement.attr(ITEM_PROP));
         schema.setProperties(properties);
 
         // Find all the objects in this object and map them to Schema
@@ -91,6 +95,10 @@ public class MicrodataExtractor implements Extractor {
     private String getValue(Element element) {
         if (HYPERLINK_TAG.equals(element.tagName()) && element.hasAttr("href")) {
             return element.attr("href");
+        }
+
+        if (IMAGE_TAG.equals(element.tagName()) && element.hasAttr("src")) {
+            return element.attr("src");
         }
 
         if (element.hasAttr("content")) {

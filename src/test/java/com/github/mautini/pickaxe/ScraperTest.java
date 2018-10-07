@@ -3,11 +3,7 @@ package com.github.mautini.pickaxe;
 import com.github.mautini.pickaxe.model.Entity;
 import com.google.common.collect.ImmutableList;
 import com.google.schemaorg.SchemaOrgType;
-import com.google.schemaorg.core.Event;
-import com.google.schemaorg.core.Offer;
-import com.google.schemaorg.core.Place;
-import com.google.schemaorg.core.PostalAddress;
-import com.google.schemaorg.core.Thing;
+import com.google.schemaorg.core.*;
 import com.google.schemaorg.core.datatype.DataType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -43,6 +39,7 @@ public class ScraperTest {
                 "    \"name\": \"The Hi-Dive\"\n" +
                 "  },\n" +
                 "  \"name\": \"Typhoon with Radiation City\",\n" +
+                "  \"image\": \"http://localhost/image.png\",\n" +
                 "  \"offers\": {\n" +
                 "    \"@type\": \"Offer\",\n" +
                 "    \"price\": \"13.00\",\n" +
@@ -70,6 +67,7 @@ public class ScraperTest {
                 " <div class=\"event-title\" itemprop=\"name\">\n" +
                 "  Typhoon with Radiation City\n" +
                 " </div> \n" +
+                " <img itemprop=\"image\" src=\"http://localhost/image.png\"> \n" +
                 " <div class=\"event-venue\" itemprop=\"location\" itemscope itemtype=\"http://schema.org/Place\"> \n" +
                 "  <span itemprop=\"name\">The Hi-Dive</span> \n" +
                 "  <div class=\"address\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\"> \n" +
@@ -105,6 +103,7 @@ public class ScraperTest {
         Event event = (Event) thing;
         assertUniqueValue(event.getStartDateList(), "2013-09-14T21:30");
         assertUniqueValue(event.getNameList(), "Typhoon with Radiation City");
+        assertUniqueValue(event.getImageList(), "http://localhost/image.png");
 
         Assertions.assertEquals(1, event.getLocationList().size());
         Assertions.assertTrue(event.getLocationList().get(0) instanceof Place);
