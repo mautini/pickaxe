@@ -6,8 +6,6 @@ import com.github.mautini.pickaxe.extractor.MicrodataExtractor;
 import com.github.mautini.pickaxe.model.Entity;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,8 +15,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Scraper {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Scraper.class);
 
     private List<Extractor> extractors;
 
@@ -44,7 +40,7 @@ public class Scraper {
         return scrap(document);
     }
 
-    private List<Entity> scrap(Document document) {
+    public List<Entity> scrap(Document document) {
         return extractors.stream()
                 .flatMap(extractor -> extractor.getThings(document).stream())
                 .collect(Collectors.toList());
