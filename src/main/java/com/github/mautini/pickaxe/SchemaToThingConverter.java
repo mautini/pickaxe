@@ -4,13 +4,16 @@ import com.github.mautini.pickaxe.model.Schema;
 import com.google.schemaorg.core.CoreConstants;
 import com.google.schemaorg.core.CoreFactory;
 import com.google.schemaorg.core.Thing;
-import org.apache.commons.lang3.StringUtils;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 
 public class SchemaToThingConverter {
+
+    private SchemaToThingConverter() {
+        throw new AssertionError();
+    }
 
     private static final String PACKAGE_SCHEMA_ORG = "com.google.schemaorg.core";
 
