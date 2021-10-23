@@ -22,8 +22,6 @@ public class MicrodataExtractor implements Extractor {
 
     private static final String ITEM_PROP = "itemprop";
 
-    private static final String HYPERLINK_TAG = "a";
-
     private static final String IMAGE_TAG = "img";
 
     @Override
@@ -88,7 +86,7 @@ public class MicrodataExtractor implements Extractor {
     }
 
     private String getValue(Element element) {
-        if (HYPERLINK_TAG.equals(element.tagName()) && element.hasAttr("href")) {
+        if (element.hasAttr("href")) {
             return element.attr("href");
         }
 
