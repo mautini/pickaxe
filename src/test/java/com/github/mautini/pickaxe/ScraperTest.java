@@ -5,20 +5,20 @@ import com.google.common.collect.ImmutableList;
 import com.google.schemaorg.SchemaOrgType;
 import com.google.schemaorg.core.*;
 import com.google.schemaorg.core.datatype.DataType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class ScraperTest {
+class ScraperTest {
 
     @Test
-    public void scraperJsonLdTest() throws IOException {
+    void scraperJsonLdTest() throws IOException {
         Scraper scraper = new Scraper();
         List<Entity> entityList = scraper.extract(
-                new File(getClass().getClassLoader().getResource("jsonld.html").getFile())
+                new File(Objects.requireNonNull(getClass().getClassLoader().getResource("jsonld.html")).getFile())
         );
 
         Assertions.assertEquals(1, entityList.size());
@@ -53,10 +53,10 @@ public class ScraperTest {
     }
 
     @Test
-    public void scraperMicrodataTest() throws IOException {
+    void scraperMicrodataTest() throws IOException {
         Scraper scraper = new Scraper();
         List<Entity> entityList = scraper.extract(
-                new File(getClass().getClassLoader().getResource("microdata.html").getFile())
+                new File(Objects.requireNonNull(getClass().getClassLoader().getResource("microdata.html")).getFile())
         );
         Assertions.assertEquals(1, entityList.size());
         Entity entity = entityList.get(0);
@@ -68,20 +68,14 @@ public class ScraperTest {
                 "  Typhoon with Radiation City\n" +
                 " </div> \n" +
                 " <img itemprop=\"image\" src=\"http://localhost/image.png\"> \n" +
-                " <div class=\"event-venue\" itemprop=\"location\" itemscope itemtype=\"http://schema.org/Place\"> \n" +
-                "  <span itemprop=\"name\">The Hi-Dive</span> \n" +
-                "  <div class=\"address\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\"> \n" +
-                "   <span itemprop=\"streetAddress\">7 S. Broadway</span> \n" +
-                "   <br> \n" +
-                "   <span itemprop=\"addressLocality\">Denver</span>, \n" +
-                "   <span itemprop=\"addressRegion\">CO</span> \n" +
-                "   <span itemprop=\"postalCode\">80209</span> \n" +
+                " <div class=\"event-venue\" itemprop=\"location\" itemscope itemtype=\"http://schema.org/Place\"> <span itemprop=\"name\">The Hi-Dive</span> \n" +
+                "  <div class=\"address\" itemprop=\"address\" itemscope itemtype=\"http://schema.org/PostalAddress\"> <span itemprop=\"streetAddress\">7 S. Broadway</span> \n" +
+                "   <br> <span itemprop=\"addressLocality\">Denver</span>, <span itemprop=\"addressRegion\">CO</span> <span itemprop=\"postalCode\">80209</span> \n" +
                 "  </div> \n" +
                 " </div> \n" +
                 " <div class=\"event-time\">\n" +
                 "  9:30 PM\n" +
-                " </div> \n" +
-                " <span itemprop=\"offers\" itemscope itemtype=\"http://schema.org/Offer\"> \n" +
+                " </div> <span itemprop=\"offers\" itemscope itemtype=\"http://schema.org/Offer\"> \n" +
                 "  <div class=\"event-price\" itemprop=\"price\" content=\"13.00\">\n" +
                 "   $13.00\n" +
                 "  </div> <span itemprop=\"priceCurrency\" content=\"USD\"></span> <a itemprop=\"url\" href=\"http://www.ticketfly.com/purchase/309433\">Tickets</a> </span> \n" +
@@ -90,10 +84,11 @@ public class ScraperTest {
     }
 
     @Test
-    public void scraperFakeNamespaceTest() throws IOException {
+    void scraperFakeNamespaceTest() throws IOException {
         Scraper scraper = new Scraper();
         List<Entity> entityList = scraper.extract(
-                new File(getClass().getClassLoader().getResource("fakeNamespace.html").getFile())
+                new File(Objects.requireNonNull(getClass().getClassLoader().getResource("fakeNamespace.html"))
+                        .getFile())
         );
         Assertions.assertEquals(0, entityList.size());
     }
